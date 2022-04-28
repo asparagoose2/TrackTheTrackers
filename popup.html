@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
+
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
       <h1>
-          Hello World!
+          Track the Trackers!
       </h1>
+      <div>
+        <canvas id="myChart"></canvas>
+      </div>  
+      <h3 id="no-trackers" style="display:none;">No trackers</h3>
+      <ul id="trackers"></ul>    
     <button id="changeColor"></button>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
     <script src="popup.js"></script>
   </body>
 </html>
