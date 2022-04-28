@@ -1,5 +1,5 @@
-const currentTrackers = [];
-
+let currentTrackers = [];
+let historyTrackers = [];
 
 
 const scanPage = () => {
@@ -39,7 +39,8 @@ const scanPage = () => {
         }
     }
     chrome.runtime.sendMessage({action: "setTrackers", trackers}, (result) => {
-        console.log(result);
+        console.log("setTrackers");
+        currentTrackers = result;
     });
 }
 
@@ -48,9 +49,20 @@ window.onload =  async () => {
     const currentTab = await chrome.tabs.query({ active: true, currentWindow: true });
     const tabId = currentTab[0].id;
     chrome.scripting.executeScript({ target: {tabId}, function: scanPage }, (results) => {
+        console.log("scanPage done");
         console.log(results);
         chrome.runtime.sendMessage({action: "getTrackers"}, (result) => {
-            console.log(result);
+                console.log("getTrackers");
+                console.log(result);
+                historyTrackers = result;
+                const list = document.getElementById('trackers');
+                result.forEach(tracker => {
+                    const li = document.createElement('li');
+                    li.innerText = tracker.url;
+                    list.appendChild(li);
+                }
+            );
+
             });
     });
 }

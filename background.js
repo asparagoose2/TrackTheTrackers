@@ -21,15 +21,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else if (request.action == "setTrackers") {
         chrome.storage.sync.get('trackers', (result) => {
             // console.log(result);
-            // let trackers = [];
+            let trackers = result.trackers || [];
             // if(result) {
             //     trackers = result.trackers;
             // }
-            // trackers.push(...request.trackers);
+            trackers.push(...request.trackers);
             console.log("setTrackers");
             console.log(request.trackers);
-            const trackers = request.trackers;
-            chrome.storage.sync.set({ trackers }, () => {
+            // const trackers = request.trackers;
+            chrome.storage.sync.set({ trackers }, function() {
                 console.log("setTrackers done");
                 sendResponse(trackers);
             }
@@ -39,6 +39,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
         sendResponse({});
     }
+    return true;
 });
 
 // const scanPage = () => {
