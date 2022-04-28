@@ -26,7 +26,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             //     trackers = result.trackers;
             // }
             // trackers.push(...request.trackers);
+            console.log("setTrackers");
+            console.log(request.trackers);
+            const trackers = request.trackers;
             chrome.storage.sync.set({ trackers }, () => {
+                console.log("setTrackers done");
                 sendResponse(trackers);
             }
             );
