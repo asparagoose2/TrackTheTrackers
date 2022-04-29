@@ -1,5 +1,3 @@
-let currentTrackers = [];
-let historyTrackers = [];
 
 
 const scanPage = () => {
@@ -27,21 +25,26 @@ const scanPage = () => {
             const hostname = new URL(src).hostname;
             knownTrackers.forEach(tracker => {
                 if(src.includes(tracker)) {
-                    trackers.push({
-                        url: src,
-                        providerName: hostname,
-                        foundOn: [window.location.href]
-                    });
+                    trackers.push(src);
+                    // trackers.push({
+                    //     url: src,
+                    //     providerName: hostname,
+                    //     foundOn: [window.location.href]
+                    // });
                 }
             });
             
             
         }
     }
-    chrome.runtime.sendMessage({action: "setTrackers", trackers}, (result) => {
+    const currentURL = new URL(window.location.href).hostname;
+    
+    chrome.runtime.sendMessage({action: "setTrackers", trackers, url: currentURL}, (result) => {
         console.log("setTrackers");
-        currentTrackers = result;
+        console.log(result);
+       
     });
+    return currentURL;
 }
 
 window.onload =  async () => {
@@ -51,20 +54,37 @@ window.onload =  async () => {
     chrome.scripting.executeScript({ target: {tabId}, function: scanPage }, (results) => {
         console.log("scanPage done");
         console.log(results);
+        chrome.storage.local.get(['trackers'], (res) => {
+            const result = res.trackers;
+            console.log("result");
+            console.log(result);
+            const currentTrackers = [];
+            const currentURL = results[0].result;
+            console.log("currentURL");
+            console.log(currentURL);
+            for(const tracker in result) {
+                if(result[tracker].foundOn.includes(currentURL)) {
+                    currentTrackers.push(result[tracker].providerName);
+                }   
+            }
+            console.log("currentTrackers");
+            console.log(currentTrackers);
+            const list = document.getElementById('trackers');
+            currentTrackers.forEach(tracker => {
+                console.log("tracker ",tracker);
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerText = tracker;
+                list.appendChild(li);
+            });
+        });
         chrome.runtime.sendMessage({action: "getTrackers"}, (result) => {
                 console.log("getTrackers");
                 console.log(result);
-                historyTrackers = result;
-                const list = document.getElementById('trackers');
-                result.forEach(tracker => {
-                    const li = document.createElement('li');
-                    li.innerText = tracker.url;
-                    list.appendChild(li);
-                }
-            );
+                
+        });
 
-            });
-    });
+        });
 }
 
 

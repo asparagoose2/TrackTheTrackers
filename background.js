@@ -9,9 +9,11 @@
 */
 
 
+
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action == "getTrackers") {
-        chrome.storage.sync.get('trackers', (result) => {
+        chrome.storage.local.get('trackers', (result) => {
             if(result.trackers) {
                 sendResponse(result.trackers);
             } else {
@@ -19,17 +21,88 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
         });
     } else if (request.action == "setTrackers") {
-        chrome.storage.sync.get('trackers', (result) => {
-            // console.log(result);
-            let trackers = result.trackers || [];
-            // if(result) {
-            //     trackers = result.trackers;
-            // }
-            trackers.push(...request.trackers);
+        // chrome.storage.sync.clear();
+        chrome.storage.local.get('trackers', (result) => {
+            let trackers = result.trackers || {};
+            request.trackers.forEach(tracker => {
+                if(tracker.includes('twitter')) {
+                    if(!trackers.twitter) {
+                        trackers.twitter = {
+                            providerName: 'twitter',
+                            url: tracker,
+                            foundOn: [request.url]
+                        };
+                        // trackers.twitter.foundOn.add(request.url);
+                    } else {
+                        // trackers.twitter.foundOn.add(request.url);
+                        trackers.twitter.foundOn.push(request.url);
+                    }
+                } else if (tracker.includes('google')) {
+                    if(!trackers.google) {
+                        trackers.google = {
+                            providerName: 'google',
+                            url: tracker,
+                            foundOn: [request.url]
+                        };
+                        // trackers.google.foundOn.add(request.url);
+                    } else {
+                        // trackers.google.foundOn.add(request.url);
+                        trackers.google.foundOn.push(request.url);
+                    }
+                } else if (tracker.includes('facebook')) {
+                    if(!trackers.facebook) {
+                        trackers.facebook = {
+                            providerName: 'facebook',
+                            url: tracker,
+                            foundOn: [request.url]
+                        };
+                        // trackers.facebook.foundOn.add(request.url);
+                    } else {
+                        // trackers.facebook.foundOn.add(request.url);
+                        trackers.facebook.foundOn.push(request.url);
+                    }
+                } else if (tracker.includes('amazon')) {
+                    if(!trackers.amazon) {
+                        trackers.amazon = {
+                            providerName: 'amazon',
+                            url: tracker,
+                            foundOn: [request.url]
+                        };
+                        // trackers.amazon.foundOn.add(request.url);
+                    } else {
+                        // trackers.amazon.foundOn.add(request.url);
+                        trackers.amazon.foundOn.push(request.url);
+                    }
+                } else if (tracker.includes('yahoo')) {
+                    if(!trackers.yahoo) {
+                        trackers.yahoo = {
+                            providerName: 'yahoo',
+                            url: tracker,
+                            foundOn: [request.url]
+                        };
+                        // trackers.yahoo.foundOn.add(request.url);
+                    } else {
+                        // trackers.yahoo.foundOn.add(request.url);
+                        trackers.yahoo.foundOn.push(request.url);
+                    }
+                } else if (tracker.includes('doubleclick')) {
+                    if(!trackers.doubleclick) {
+                        trackers.doubleclick = {
+                            providerName: 'doubleclick',
+                            url: tracker,
+                            foundOn: new Set()
+                        };
+                        trackers.doubleclick.foundOn.add(request.url);
+                    } else {
+                        trackers.doubleclick.foundOn.add(request.url);
+                    }
+                }
+            });
+
             console.log("setTrackers");
             console.log(request.trackers);
             // const trackers = request.trackers;
-            chrome.storage.sync.set({ trackers }, function() {
+            chrome.storage.local.set({ trackers }, function() {
                 console.log("setTrackers done");
                 sendResponse(trackers);
             }
